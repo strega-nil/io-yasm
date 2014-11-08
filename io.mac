@@ -1,0 +1,62 @@
+%ifndef IO_MAC
+%define IO_MAC
+
+%macro read 2
+    mov rax, 0  ; read syscall
+    mov rdi, 0  ; stdin
+    mov rsi, %1 ; read to
+    mov rdx, %2 ; how many max to read
+    syscall     ; actually read
+
+; This zero escapes the sequence
+    mov rax, -1  ; indexer
+    mov cl, 0xA  ; newline
+    not cl       ; ~newline
+
+    %%loop:
+    inc rax
+    cmp rax, %2
+    jge %%end
+    mov dl, [%1+rax] ; array indexing. Index = 1 byte
+    test dl, cl
+    jnz %%loop
+
+    %%end mov byte [%1+rax], 0
+%endmacro
+
+%macro print 1
+    strlen %1   ; pushes length of %1
+    mov rax, 1  ; write syscall
+    mov rdi, 1  ; stdout
+    mov rsi, %1 ; read from
+    pop rdx     ; strlen(%1)
+    syscall
+%endmacro
+
+%macro print 2
+    mov rax, 1  ; write syscall
+    mov rdi, 1  ; stdout
+    mov rsi, %1 ; read from
+    mov rdx, %2
+    syscall
+%endmacro
+
+%macro strlen 1
+    mov rax, -1
+    xor rdx, rdx
+    %%count_loop:
+    inc rax
+    mov dl, [%1+rax]
+    test dl, dl
+    jnz %%count_loop
+
+    push rax
+%endmacro
+
+%macro exit 1
+    mov rax, 60 ; exit syscall
+    mov rdi, %1 ; exit value
+    syscall
+%endmacro
+
+%endif
