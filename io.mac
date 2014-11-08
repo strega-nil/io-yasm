@@ -25,11 +25,11 @@
 %endmacro
 
 %macro print 1
-    strlen %1   ; pushes length of %1
+    strlen %1   ; length of %1 in rax
+    mov rdx, rax
     mov rax, 1  ; write syscall
     mov rdi, 1  ; stdout
     mov rsi, %1 ; read from
-    pop rdx     ; strlen(%1)
     syscall
 %endmacro
 
@@ -49,8 +49,6 @@
     mov dl, [%1+rax]
     test dl, dl
     jnz %%count_loop
-
-    push rax
 %endmacro
 
 %macro exit 1
