@@ -2,8 +2,8 @@ global _start
 
 section .text
 
-extern printf
-extern gets
+extern asmio_printf
+extern asmio_gets
 
 %macro exit 1
     mov rax, 60 ; exit syscall
@@ -14,19 +14,19 @@ extern gets
 global _start
 _start:
     mov rdi, startup
-    call printf
+    call asmio_printf
 
     mov rdi, name
     mov rsi, 32
-    call gets
+    call asmio_gets
 
     mov rdi, hello
     mov rsi, name
-    call printf
+    call asmio_printf
 
     mov rdi, equation
     mov rsi, 42
-    call printf
+    call asmio_printf
 
     exit 0
 

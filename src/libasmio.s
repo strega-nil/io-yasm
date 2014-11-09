@@ -27,8 +27,8 @@
 
 ; rdi => const char * buf
 ; rsi => int len (how big buf is)
-global gets
-gets:
+global asmio_gets
+asmio_gets:
     push rbp
     mov rbp, rsp
 
@@ -69,8 +69,8 @@ gets:
 ; rdi => const char * format_string
 ; rsi, rdx, rcx, r8, r9 => rest of the things
 ; takes up to six arguments. No more may be pushed!
-global printf
-printf:
+global asmio_printf
+asmio_printf:
     push rbp
     mov rbp, rsp
     push r12     ; Push registers we'll use
