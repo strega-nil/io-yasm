@@ -1,15 +1,21 @@
 global _start
 
-%include "io.mac"
-
 section .text
+
+%macro exit 1
+    mov rax, 60 ; exit syscall
+    mov rdi, %1 ; exit value
+    syscall
+%endmacro
 
 global _start
 _start:
     mov rdi, startup
     call printf
 
-    read name, 32
+    mov rdi, name
+    mov rsi, 32
+    call gets
 
     mov rdi, hello
     mov rsi, name
