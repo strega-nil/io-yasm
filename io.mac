@@ -1,30 +1,6 @@
 %ifndef IO_MAC
 %define IO_MAC
 
-%macro read 2
-    mov rax, 0  ; read syscall
-    mov rdi, 0  ; stdin
-    mov rsi, %1 ; read to
-    mov rdx, %2 ; how many max to read
-    syscall     ; actually read
-
-; This zero escapes the sequence
-    mov rax, -1  ; indexer
-    mov cl, 0xA  ; newline
-
-    %%loop:
-    inc rax
-    cmp rax, %2
-    jge %%end
-    mov dl, [%1+rax] ; array indexing. Index = 1 byte
-    cmp cl, dl
-    je %%end
-    test cl, cl
-    jne %%loop
-
-    %%end mov byte [%1+rax], 0
-%endmacro
-
 %macro puts 1
     strlen %1   ; length of %1 in rax
     mov rdx, rax
@@ -44,12 +20,6 @@
     jnz %%count_loop
 %endmacro
 
-%macro exit 1
-    mov rax, 60 ; exit syscall
-    mov rdi, %1 ; exit value
-    syscall
-%endmacro
-
 %macro putc 1
     mov rax, 1
     mov rdi, 1
@@ -57,6 +27,44 @@
     mov rdx, 1
     syscall
 %endmacro
+
+; rdi => const char * buf
+; rsi => int len (how big buf is)
+global gets
+gets:
+    push rbp
+    mov rbp, rsp
+
+    mov rdx, rsi ; how many maximum to read (len)
+    mov rsi, rdi ; where to read to (buf)
+    mov rax, 0   ; read syscall
+    mov rdi, 0   ; using stdin
+    syscall
+
+    ; Zero escaping the sequence
+
+    mov rax, -1  ; buf index
+    mov cl, 0xA  ; newline
+    mov ch, -1   ; EOF
+
+    gets_loop:
+        inc rax
+        cmp rax, rdx
+        jge gets_end     ; test if we've reached len
+        mov dl, [rsi+rax]
+        cmp dl, cl
+        je gets_end      ; test if it's a newline
+        cmp dl, ch
+        je gets_end      ; test if it's an EOF
+        test dl, dl
+        jne gets_loop    ; test if it's a \0
+
+    gets_end:
+        mov byte [rsi+rax], 0
+
+        mov rsp, rbp
+        pop rbp
+        ret
 
 ; rdi => const char * format_string
 ; rsi, rdx, rcx, r8, r9 => rest of the things
