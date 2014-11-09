@@ -6,17 +6,17 @@ section .text
 
 global _start
 _start:
-    read name, 32
+    ;read name, 32
 
-    print hello
-    print name
-    print nl
+    mov rdi, hello
+    mov rsi, name
+    call printf
 
     exit 0
 
 section .bss
-name resb 32
+;name resb 32
 
 section .data
-hello db "Hello, ", 0
-nl db 0xA, 0
+hello db "Hello, %s. This is a test!", 0xA, 0
+name db "Nicholas", 0
