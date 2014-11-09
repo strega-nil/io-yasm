@@ -135,7 +135,6 @@ printf:
         pop rbp
         ret
 
-global print_num
 ; rdi => number to be printed
 print_num:
     push rbp
