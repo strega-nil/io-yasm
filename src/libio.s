@@ -35,6 +35,9 @@ gets:
     push rbp
     mov rbp, rsp
 
+    cmp rsi, 0
+    jle gets_end
+
     mov rdx, rsi ; how many maximum to read (len)
     mov rsi, rdi ; where to read to (buf)
     mov rax, 0   ; read syscall

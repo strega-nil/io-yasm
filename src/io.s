@@ -2,6 +2,9 @@ global _start
 
 section .text
 
+extern printf
+extern gets
+
 %macro exit 1
     mov rax, 60 ; exit syscall
     mov rdi, %1 ; exit value
