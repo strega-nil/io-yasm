@@ -1,6 +1,3 @@
-%ifndef IO_MAC
-%define IO_MAC
-
 %macro puts 1
     strlen %1   ; length of %1 in rax
     mov rdx, rax
@@ -198,5 +195,3 @@ print_num:
         mov rsp, rbp
         pop rbp
         ret
-
-%endif
