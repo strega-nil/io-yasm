@@ -17,10 +17,11 @@
     jnz %%count_loop
 %endmacro
 
-%macro putc 1
+; uses the last pushed arg
+%macro putc 0
     mov rax, 1
     mov rdi, 1
-    mov rsi, %1
+    mov rsi, rsp
     mov rdx, 1
     syscall
 %endmacro
@@ -68,7 +69,6 @@ asmio_gets:
 
 ; rdi => const char * format_string
 ; rsi, rdx, rcx, r8, r9 => rest of the things
-; takes up to six arguments. No more may be pushed!
 global asmio_printf
 asmio_printf:
     push rbp
@@ -76,24 +76,54 @@ asmio_printf:
     push r12     ; Push registers we'll use
     push r13
     push r14
-    push r15
-    sub rsp, 48  ; save and start the stack frame
-                 ; 1 char (+ 7 padding)
-                 ; 5 arguments
-
-    mov [rsp+8], rsi  ; save argument registers
-    mov [rsp+16], rdx
-    mov [rsp+24], rcx
-    mov [rsp+32], r8
-    mov [rsp+40], r9
+    push r15     ; save and start the stack frame
 
     mov r12, 0    ; char array index
     mov r13, rdi  ; char array
-    mov r15, 0    ; argument index
+    mov r15, 0    ; amount of arguments
+
+    push rcx ; gotta save the arg register
+    printf_count_varargs:
+        mov cl, [r13+r12]
+        cmp cl, 0x25 ; is cl a %?
+        jne printf_count_not_arg ; no
+        inc r12
+        mov cl, [r13+r12]
+        cmp cl, 0x25 ; is it a %%?
+        je printf_count_not_arg ; yes
+        inc r15 ; no, it's an arg
+    printf_count_not_arg:
+        inc r12
+        test cl, cl
+        jnz printf_count_varargs
+
+    pop rcx ; gotta save this arg register
+
+    end_of_count_args:
+
+    cmp r15, 5
+    jle no_pushed_args ; less than five arguments
+    sub r15, 4 ; r15 now shows how many pushed args there are + 1
+    get_pushed_args:
+        mov r12, [rbp+(8*r15)] ; rbp + 16 is the last pushed arg
+        push r12
+        dec r15
+        cmp r15, 1 ; r15 must be at least 2
+        jg get_pushed_args
+
+    no_pushed_args:
+        push r9
+        push r8
+        push rcx
+        push rdx
+        push rsi  ; push argument registers
+
+
+    mov r12, 0    ; char array index
+    mov r13, rdi  ; char array
 
     printf_load_argument:
-        inc r15
-        mov r14, [rsp+8*r15] ; argument
+        pop r14 ; argument
 
     printf_loop:
         mov cl, [r13+r12]
@@ -101,8 +131,9 @@ asmio_printf:
         jz printf_end
         cmp cl, 0x25 ; is cl a %?
         je printf_what_type ; yes
-        mov [rsp], cl ; no
-        putc rsp
+        push rcx ; no
+        putc
+        pop rcx
         inc r12
         jmp printf_loop
 
@@ -129,8 +160,9 @@ asmio_printf:
         jmp printf_load_argument
 
     printf_percent_sign:
-        mov byte [rsp], 0x25
-        putc rsp
+        push 0x25
+        putc
+        pop rcx
         jmp printf_loop
 
     printf_end:

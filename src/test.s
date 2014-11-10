@@ -24,6 +24,26 @@ _start:
     mov rsi, name
     call asmio_printf
 
+    mov rdi, test_pushed
+    mov rsi, test_pushee
+    mov rdx, test_pushee
+    mov rcx, test_pushee
+    mov r8, test_pushee
+    mov r9, test_pushee
+    push test_pushee
+    push test_pushee
+    push test_pushee
+    push test_pushee
+    push test_pushee
+
+    call asmio_printf
+
+    pop rax
+    pop rax
+    pop rax
+    pop rax
+    pop rax
+
     mov rdi, equation
     mov rsi, 42
     call asmio_printf
@@ -37,3 +57,5 @@ section .data
 startup db "What's your name?", 0xA, 0
 hello db "Hello, %s", 0xA, 0
 equation db "The answer to life is %d", 0xA, 0
+test_pushed db "Test of varargs > 5: %s %s %s %s %s %s %s %s %s %s", 0xA, 0
+test_pushee db "a", 0
