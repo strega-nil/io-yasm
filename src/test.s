@@ -25,21 +25,18 @@ _start:
     call asmio_printf
 
     mov rdi, test_pushed
-    mov rsi, test_pushee
-    mov rdx, test_pushee
-    mov rcx, test_pushee
-    mov r8, test_pushee
-    mov r9, test_pushee
-    push test_pushee
-    push test_pushee
-    push test_pushee
-    push test_pushee
-    push test_pushee
+    mov rsi, test_pushee_a
+    mov rdx, test_pushee_b
+    mov rcx, test_pushee_c
+    mov r8, test_pushee_a
+    mov r9, test_pushee_b
+    ; because for legacy reasons you must push backwards
+    push test_pushee_b
+    push test_pushee_a
+    push test_pushee_c
 
     call asmio_printf
 
-    pop rax
-    pop rax
     pop rax
     pop rax
     pop rax
@@ -57,5 +54,7 @@ section .data
 startup db "What's your name?", 0xA, 0
 hello db "Hello, %s", 0xA, 0
 equation db "The answer to life is %d", 0xA, 0
-test_pushed db "Test of varargs > 5: %s %s %s %s %s %s %s %s %s %s", 0xA, 0
-test_pushee db "a", 0
+test_pushed db "Test of varargs > 5: a%s b%s c%s a%s b%s c%s a%s b%s", 0xA, 0
+test_pushee_a db "a", 0
+test_pushee_b db "b", 0
+test_pushee_c db "c", 0
