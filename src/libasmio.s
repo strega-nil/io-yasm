@@ -81,8 +81,8 @@ asmio_printf:
 
     mov r12, 0    ; char array index
     mov r13, rdi  ; char array
-    mov r14, -1   ; amount of fp arguments
-    mov r15, -1   ; amount of general arguments
+    mov r14, 0   ; amount of fp arguments
+    mov r15, 0   ; amount of general arguments
     mov r11, 2    ; amount of pushed arguments + 2 (rbp+16 is the first pushed
                   ; argument
 
@@ -99,14 +99,12 @@ asmio_printf:
         je printf_count_varargs_float ; yes
         
     printf_count_varargs_gen:
-        inc r15
         cmp r15, 4  ; 0-4
         jg printf_count_varargs_pushed
+        inc r15
 
         ; This should be a switch statement, but I can't figure out how to do
         ; that.
-        cmp r15, 0
-        je printf_va_gen_case_0
         cmp r15, 1
         je printf_va_gen_case_1
         cmp r15, 2
@@ -115,29 +113,30 @@ asmio_printf:
         je printf_va_gen_case_3
         cmp r15, 4
         je printf_va_gen_case_4
-        printf_va_gen_case_0:
+        cmp r15, 5
+        je printf_va_gen_case_5
+
+        printf_va_gen_case_1:
             push rsi
             jmp printf_count_varargs_continue
-        printf_va_gen_case_1:
+        printf_va_gen_case_2:
             push rdx
             jmp printf_count_varargs_continue
-        printf_va_gen_case_2:
+        printf_va_gen_case_3:
             push rcx
             jmp printf_count_varargs_continue
-        printf_va_gen_case_3:
+        printf_va_gen_case_4:
             push r8
             jmp printf_count_varargs_continue
-        printf_va_gen_case_4:
+        printf_va_gen_case_5:
             push r9
             jmp printf_count_varargs_continue
 
     printf_count_varargs_float:
-        inc r14
         cmp r14, 7
         jg printf_count_varargs_pushed
+        inc r14
 
-        cmp r14, 0
-        je printf_va_float_case_0
         cmp r14, 1
         je printf_va_float_case_1
         cmp r14, 2
@@ -152,36 +151,38 @@ asmio_printf:
         je printf_va_float_case_6
         cmp r14, 7
         je printf_va_float_case_7
+        cmp r14, 8
+        je printf_va_float_case_8
 
-        printf_va_float_case_0:
+        printf_va_float_case_1:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm0
             jmp printf_count_varargs_continue
-        printf_va_float_case_1:
+        printf_va_float_case_2:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm1
             jmp printf_count_varargs_continue
-        printf_va_float_case_2:
+        printf_va_float_case_3:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm2
             jmp printf_count_varargs_continue
-        printf_va_float_case_3:
+        printf_va_float_case_4:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm3
             jmp printf_count_varargs_continue
-        printf_va_float_case_4:
+        printf_va_float_case_5:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm4
             jmp printf_count_varargs_continue
-        printf_va_float_case_5:
+        printf_va_float_case_6:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm5
             jmp printf_count_varargs_continue
-        printf_va_float_case_6:
+        printf_va_float_case_7:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm6
             jmp printf_count_varargs_continue
-        printf_va_float_case_7:
+        printf_va_float_case_8:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm7
             jmp printf_count_varargs_continue
@@ -196,13 +197,22 @@ asmio_printf:
         test bl, bl
         jnz printf_count_varargs
 
+    dbg_thing:
+    add r15, r11  ; arg index
+    add r15, r14
+    push r15 ; how many arguments we need to pop
+    sub r15, 2
+    imul r15, 8
+
     mov r12, 0    ; char array index
     mov r13, rdi  ; char array
     mov r14, 0    ; float arg index
-    mov r15, 0    ; general arg index
 
     printf_load_argument:
-        pop rbx
+        mov rbx, rsp
+        add rbx, r15
+        mov rbx, [rbx]
+        sub r15, 8
 
     printf_loop:
         mov cl, [r13+r12]
@@ -234,7 +244,7 @@ asmio_printf:
 
     printf_int:
         mov rdi, rbx
-        call print_num
+        call print_int
         inc r12
         jmp printf_load_argument
 
@@ -245,7 +255,11 @@ asmio_printf:
         jmp printf_loop
 
     printf_end:
-        add rsp, 48
+        pop r15
+        sub r15, 2
+        imul r15, 8
+        add rsp, r15 ; get rid of the varargs stack
+
         pop r15
         pop r14
         pop r13
@@ -256,7 +270,7 @@ asmio_printf:
         ret
 
 ; rdi => number to be printed
-print_num:
+print_int:
     push rbp
     mov rbp, rsp
     push r12
