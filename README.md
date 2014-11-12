@@ -1,4 +1,4 @@
 io-yasm
 =======
 
-Simple set of macros (and a function) for i/o in yasm. For practice.
+Simple set of functions for i/o on Linux x64, written in yasm. For practice.
