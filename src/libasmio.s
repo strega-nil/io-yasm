@@ -103,32 +103,28 @@ asmio_printf:
         jg printf_count_varargs_pushed
         inc r15
 
-        ; This should be a switch statement, but I can't figure out how to do
-        ; that.
-        cmp r15, 1
-        je printf_va_gen_case_1
-        cmp r15, 2
-        je printf_va_gen_case_2
-        cmp r15, 3
-        je printf_va_gen_case_3
-        cmp r15, 4
-        je printf_va_gen_case_4
-        cmp r15, 5
-        je printf_va_gen_case_5
+        mov rax, r15
+        dec rax             ; put whichever case into rax
+        imul rax, 7
+        add rax, printf_va_gen_case_0
+        jmp rax             ; jump to the right case
 
-        printf_va_gen_case_1:
+        printf_va_gen_case_0:
             push rsi
             jmp printf_count_varargs_continue
-        printf_va_gen_case_2:
+            nop
+        printf_va_gen_case_1:
             push rdx
             jmp printf_count_varargs_continue
-        printf_va_gen_case_3:
+            nop
+        printf_va_gen_case_2:
             push rcx
             jmp printf_count_varargs_continue
-        printf_va_gen_case_4:
+            nop
+        printf_va_gen_case_3:
             push r8
             jmp printf_count_varargs_continue
-        printf_va_gen_case_5:
+        printf_va_gen_case_4:
             push r9
             jmp printf_count_varargs_continue
 
@@ -137,52 +133,41 @@ asmio_printf:
         jg printf_count_varargs_pushed
         inc r14
 
-        cmp r14, 1
-        je printf_va_float_case_1
-        cmp r14, 2
-        je printf_va_float_case_2
-        cmp r14, 3
-        je printf_va_float_case_3
-        cmp r14, 4
-        je printf_va_float_case_4
-        cmp r14, 5
-        je printf_va_float_case_5
-        cmp r14, 6
-        je printf_va_float_case_6
-        cmp r14, 7
-        je printf_va_float_case_7
-        cmp r14, 8
-        je printf_va_float_case_8
+        mov rax, r14
+        dec rax             ; put whichever case into rax
+        imul rax, 11
+        add rax, printf_va_float_case_0
+        jmp rax             ; jump to the right case
 
-        printf_va_float_case_1:
+        printf_va_float_case_0:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm0
             jmp printf_count_varargs_continue
-        printf_va_float_case_2:
+        printf_va_float_case_1:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm1
             jmp printf_count_varargs_continue
-        printf_va_float_case_3:
+        printf_va_float_case_2:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm2
             jmp printf_count_varargs_continue
-        printf_va_float_case_4:
+        printf_va_float_case_3:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm3
             jmp printf_count_varargs_continue
-        printf_va_float_case_5:
+        printf_va_float_case_4:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm4
             jmp printf_count_varargs_continue
-        printf_va_float_case_6:
+        printf_va_float_case_5:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm5
             jmp printf_count_varargs_continue
-        printf_va_float_case_7:
+        printf_va_float_case_6:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm6
             jmp printf_count_varargs_continue
-        printf_va_float_case_8:
+        printf_va_float_case_7:
             sub rsp, 8  ; Manual push
             movlpd [rsp], xmm7
             jmp printf_count_varargs_continue
