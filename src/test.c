@@ -19,6 +19,6 @@ int main(void) {
                  a, b, c, d, e, a, b, c, d, e);
 
     double z = 1.0;
-    asmio_printf("Hello! %f %f %f %f %f %f %f %f %f %f %f %f",
+    asmio_printf("Hello! %f %f %f %f %f %f %f %f %f %f %f %f\n",
                          z, z, z, z, z, z, z, z, z, z, z, z);
 }

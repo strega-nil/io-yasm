@@ -140,7 +140,7 @@ asmio_printf:
         jmp rax             ; jump to the right case
 
         printf_va_float_case_0:
-            sub rsp, 8  ; Manual push
+            sub rsp, 8  ; Manual push; you can't actually push an xmm register
             movlpd [rsp], xmm0
             jmp printf_count_varargs_continue
         printf_va_float_case_1:
@@ -182,7 +182,6 @@ asmio_printf:
         test bl, bl
         jnz printf_count_varargs
 
-    dbg_thing:
     add r15, r11  ; arg index
     add r15, r14
     push r15 ; how many arguments we need to pop
@@ -218,6 +217,8 @@ asmio_printf:
         je printf_str
         cmp cl, 0x64 ; d
         je printf_int
+        cmp cl, 0x66 ; f
+        je printf_float
         cmp cl, 0x25 ; %
         je printf_percent_sign
         jmp printf_loop
@@ -230,6 +231,10 @@ asmio_printf:
     printf_int:
         mov rdi, rbx
         call print_int
+        inc r12
+        jmp printf_load_argument
+
+    printf_float: ; TODO
         inc r12
         jmp printf_load_argument
 
