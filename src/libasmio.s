@@ -1,3 +1,7 @@
+global asmio_gets ; line 34
+global asmio_puts ; line 74
+global asmio_printf ; line 86
+
 %macro puts 1
     strlen %1   ; length of %1 in rax
     mov rdx, rax
@@ -28,7 +32,6 @@
 
 ; rdi => const char * buf
 ; rsi => int len (how big buf is)
-global asmio_gets
 asmio_gets:
     push rbp
     mov rbp, rsp
@@ -67,9 +70,19 @@ asmio_gets:
         pop rbp
         ret
 
+; rdi => const char * string
+asmio_puts:
+    push rbp
+    mov rbp, rsp
+
+    puts rax
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
 ; rdi => const char * format_string
 ; rsi, rdx, rcx, r8, r9 => rest of the things
-global asmio_printf
 asmio_printf:
     push rbp
     mov rbp, rsp
@@ -311,3 +324,4 @@ print_int:
         mov rsp, rbp
         pop rbp
         ret
+

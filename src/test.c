@@ -21,4 +21,6 @@ int main(void) {
     double z = 1.0;
     asmio_printf("Hello! %f %f %f %f %f %f %f %f %f %f %f %f\n",
                          z, z, z, z, z, z, z, z, z, z, z, z);
+
+    asmio_printf("Mix floats (%f), ints (%d), and %s\n", z, 23, "strings");
 }
