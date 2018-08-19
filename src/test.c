@@ -1,16 +1,18 @@
 #include "libasmio.h"
 
+#define NAME_SIZE 40
+
 int main(void) {
-    char name[20];
-    char comp_name[] = "Chrubuntu";
-    char a[] = "a";
-    char b[] = "b";
-    char c[] = "c";
-    char d[] = "d";
-    char e[] = "e";
+   char name[NAME_SIZE];
+   char const comp_name[] = "Chrubuntu";
+   char const a[] = "a";
+   char const b[] = "b";
+   char const c[] = "c";
+   char const d[] = "d";
+   char const e[] = "e";
 
    asmio_printf("What's your name?\n");
-   asmio_gets(name, 20);
+   asmio_gets(name, NAME_SIZE);
 
    asmio_printf("Hello, %s! I'm %s!\n", name, comp_name);
 

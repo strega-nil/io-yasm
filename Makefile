@@ -2,7 +2,6 @@ all: _test_s _test_c _libasmio
 	ld -o test_s obj/test_s.o obj/libasmio.o
 	clang -o test_c obj/test_c.o obj/libasmio.o
 
-# Fuck yasm. You need to *explicitly create* the obj folder
 _test_s: _obj_folder
 	yasm -f elf64 -g dwarf2 -o obj/test_s.o src/test.s
 
